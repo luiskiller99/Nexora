@@ -1,6 +1,19 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+}
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.inputStream().use(::load)
+    }
+}
+
+fun propertyOrEmpty(name: String): String {
+    return providers.gradleProperty(name).orNull ?: localProperties.getProperty(name, "")
 }
 
 android {
@@ -19,6 +32,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "SUPABASE_URL", "\"${propertyOrEmpty("SUPABASE_URL")}\"")
+        buildConfigField("String", "SUPABASE_KEY", "\"${propertyOrEmpty("SUPABASE_KEY")}\"")
     }
 
     buildTypes {
@@ -36,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
