@@ -32,6 +32,7 @@ fun DashboardScreen(
     onProductosClick: () -> Unit,
     onPedidosClick: () -> Unit,
     onCreditoClick: () -> Unit,
+    onPromocionesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val gradient = Brush.verticalGradient(
@@ -96,6 +97,13 @@ fun DashboardScreen(
                     modifier = Modifier.weight(1f)
                 )
             }
+
+            DashboardCard(
+                title = "Promociones",
+                accent = listOf(Color(0xFF3B82F6), Color(0xFF9333EA)),
+                onClick = onPromocionesClick,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
@@ -174,6 +182,7 @@ private fun DashboardPreview() {
         onClientesClick = {},
         onProductosClick = {},
         onPedidosClick = {},
-        onCreditoClick = {}
+        onCreditoClick = {},
+        onPromocionesClick = {}
     )
 }
