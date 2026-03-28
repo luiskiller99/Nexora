@@ -7,19 +7,25 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.example.nexora.ui.viewmodel.ClientesViewModel
 import com.example.nexora.ui.viewmodel.LoginViewModel
+import com.example.nexora.ui.viewmodel.ProductosViewModel
 import com.example.nexora.ui.viewmodel.PromocionesViewModel
 
 private enum class NexoraDestination {
     Login,
     Dashboard,
-    Promociones
+    Promociones,
+    Clientes,
+    Productos
 }
 
 @Composable
 fun NexoraApp(
     loginViewModel: LoginViewModel,
     promocionesViewModel: PromocionesViewModel,
+    clientesViewModel: ClientesViewModel,
+    productosViewModel: ProductosViewModel,
     modifier: Modifier = Modifier
 ) {
     var currentDestination by rememberSaveable {
@@ -43,8 +49,8 @@ fun NexoraApp(
 
         NexoraDestination.Dashboard -> {
             DashboardScreen(
-                onClientesClick = {},
-                onProductosClick = {},
+                onClientesClick = { currentDestination = NexoraDestination.Clientes },
+                onProductosClick = { currentDestination = NexoraDestination.Productos },
                 onPedidosClick = {},
                 onCreditoClick = {},
                 onPromocionesClick = { currentDestination = NexoraDestination.Promociones },
@@ -62,6 +68,27 @@ fun NexoraApp(
                 onActualizarFondo = promocionesViewModel::actualizarFondo,
                 onGenerarImagen = { promocionesViewModel.generarImagen(context) },
                 onEnviarPromocion = { promocionesViewModel.compartirPromocion(context) },
+                modifier = modifier
+            )
+        }
+
+        NexoraDestination.Clientes -> {
+            ClientesScreen(
+                clientes = clientesViewModel.listaClientes,
+                onBackClick = { currentDestination = NexoraDestination.Dashboard },
+                onAgregarCliente = clientesViewModel::agregarCliente,
+                onAgregarDesdeContacto = clientesViewModel::agregarDesdeContacto,
+                modifier = modifier
+            )
+        }
+
+        NexoraDestination.Productos -> {
+            ProductosScreen(
+                productos = productosViewModel.listaProductos,
+                imagenSeleccionadaUri = productosViewModel.imagenSeleccionadaUri,
+                onBackClick = { currentDestination = NexoraDestination.Dashboard },
+                onSeleccionarImagen = productosViewModel::seleccionarImagen,
+                onAgregarProducto = productosViewModel::agregarProducto,
                 modifier = modifier
             )
         }
