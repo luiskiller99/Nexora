@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import com.example.nexora.ui.viewmodel.LoginViewModel
 import com.example.nexora.ui.viewmodel.PromocionesViewModel
 
@@ -24,6 +25,7 @@ fun NexoraApp(
     var currentDestination by rememberSaveable {
         mutableStateOf(NexoraDestination.Login)
     }
+    val context = LocalContext.current
 
     when (currentDestination) {
         NexoraDestination.Login -> {
@@ -55,9 +57,11 @@ fun NexoraApp(
                 uiState = promocionesViewModel.uiState,
                 onBackClick = { currentDestination = NexoraDestination.Dashboard },
                 onToggleCliente = promocionesViewModel::toggleCliente,
-                onAgregarProducto = promocionesViewModel::agregarProducto,
-                onQuitarProducto = promocionesViewModel::quitarProducto,
-                onGenerarImagen = promocionesViewModel::marcarImagenGenerada,
+                onToggleProducto = promocionesViewModel::toggleProducto,
+                onActualizarPrecioPromo = promocionesViewModel::actualizarPrecioPromo,
+                onActualizarFondo = promocionesViewModel::actualizarFondo,
+                onGenerarImagen = { promocionesViewModel.generarImagen(context) },
+                onEnviarPromocion = { promocionesViewModel.compartirPromocion(context) },
                 modifier = modifier
             )
         }
