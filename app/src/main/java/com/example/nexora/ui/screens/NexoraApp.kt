@@ -7,15 +7,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.nexora.ui.viewmodel.LoginViewModel
+import com.example.nexora.ui.viewmodel.PromocionesViewModel
 
 private enum class NexoraDestination {
     Login,
-    Dashboard
+    Dashboard,
+    Promociones
 }
 
 @Composable
 fun NexoraApp(
     loginViewModel: LoginViewModel,
+    promocionesViewModel: PromocionesViewModel,
     modifier: Modifier = Modifier
 ) {
     var currentDestination by rememberSaveable {
@@ -42,6 +45,19 @@ fun NexoraApp(
                 onProductosClick = {},
                 onPedidosClick = {},
                 onCreditoClick = {},
+                onPromocionesClick = { currentDestination = NexoraDestination.Promociones },
+                modifier = modifier
+            )
+        }
+
+        NexoraDestination.Promociones -> {
+            PromocionesScreen(
+                uiState = promocionesViewModel.uiState,
+                onBackClick = { currentDestination = NexoraDestination.Dashboard },
+                onToggleCliente = promocionesViewModel::toggleCliente,
+                onAgregarProducto = promocionesViewModel::agregarProducto,
+                onQuitarProducto = promocionesViewModel::quitarProducto,
+                onGenerarImagen = promocionesViewModel::marcarImagenGenerada,
                 modifier = modifier
             )
         }

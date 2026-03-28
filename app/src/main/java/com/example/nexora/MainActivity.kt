@@ -8,10 +8,12 @@ import androidx.activity.viewModels
 import com.example.nexora.ui.screens.NexoraApp
 import com.example.nexora.ui.theme.NexoraTheme
 import com.example.nexora.ui.viewmodel.LoginViewModel
+import com.example.nexora.ui.viewmodel.PromocionesViewModel
 
 class MainActivity : ComponentActivity() {
 
     private val loginViewModel: LoginViewModel by viewModels()
+    private val promocionesViewModel: PromocionesViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,7 +21,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             NexoraTheme {
-                NexoraApp(loginViewModel = loginViewModel)
+                NexoraApp(
+                    loginViewModel = loginViewModel,
+                    promocionesViewModel = promocionesViewModel
+                )
             }
         }
     }
