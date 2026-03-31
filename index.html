@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexora Promoción</title>
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#0b1220; color:#fff; display:flex; min-height:100vh; align-items:center; justify-content:center; }
+    .card { width:min(92vw,720px); background:#111827; border:1px solid #374151; border-radius:16px; padding:18px; box-shadow:0 12px 34px rgba(0,0,0,.4); }
+    .hero { width:100%; height:320px; object-fit:cover; border-radius:12px; background:#1f2937; }
+    .title { font-size:2rem; margin:12px 0; color:#c4b5fd; }
+    .prod { padding:8px 10px; margin:6px 0; background:#0f172a; border-radius:10px; }
+    .normal { color:#93c5fd; }
+    .tachado { text-decoration:line-through; opacity:.9; }
+    .promo { color:#d8b4fe; font-size:1.6rem; font-weight:800; }
+    .muted { color:#9ca3af; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <p class="muted" id="estado">Cargando promoción...</p>
+    <img id="img" class="hero" alt="promoción" />
+    <h1 class="title" id="titulo">Promoción</h1>
+    <div id="productos"></div>
+    <p class="normal" id="precioNormal"></p>
+    <p class="promo" id="precioPromo"></p>
+  </div>
+
+  <script>
+    const SUPABASE_URL = "https://TU_SUPABASE_URL";
+    const API_KEY = "TU_API_KEY";
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+
+    const estado = document.getElementById("estado");
+    const img = document.getElementById("img");
+    const titulo = document.getElementById("titulo");
+    const productosDiv = document.getElementById("productos");
+    const precioNormalEl = document.getElementById("precioNormal");
+    const precioPromoEl = document.getElementById("precioPromo");
+
+    if (!id) {
+      estado.textContent = "Falta parámetro ?id=";
+    } else {
+      Promise.all([
+        fetch(`${SUPABASE_URL}/rest/v1/promociones?id=eq.${id}&select=*`, { headers: { apikey: API_KEY, Authorization: `Bearer ${API_KEY}` } }),
+        fetch(`${SUPABASE_URL}/rest/v1/promocion_productos?promocion_id=eq.${id}&select=*`, { headers: { apikey: API_KEY, Authorization: `Bearer ${API_KEY}` } })
+      ])
+      .then(async ([promoRes, prodRes]) => [await promoRes.json(), await prodRes.json()])
+      .then(([promoData, productos]) => {
+        const promo = promoData?.[0];
+        if (!promo) throw new Error("Promoción no encontrada");
+
+        estado.textContent = "";
+        titulo.textContent = promo.titulo || "Promoción";
+        img.src = promo.imagen_url || "";
+
+        productosDiv.innerHTML = "";
+        productos.forEach(p => {
+          const div = document.createElement("div");
+          div.className = "prod";
+          div.textContent = `• ${p.nombre} — ₡${Number(p.precio).toLocaleString("es-CR")}`;
+          productosDiv.appendChild(div);
+        });
+
+        const normal = Number(promo.precio_normal || 0);
+        const promoPrecio = Number(promo.precio_promo || 0);
+
+        if (promoPrecio < normal) {
+          precioNormalEl.textContent = `Precio normal: ₡${normal.toLocaleString("es-CR")}`;
+          precioNormalEl.classList.add("tachado");
+          precioPromoEl.textContent = `PRECIO PROMO: ₡${promoPrecio.toLocaleString("es-CR")}`;
+        } else {
+          precioNormalEl.textContent = "";
+          precioPromoEl.textContent = `Total: ₡${normal.toLocaleString("es-CR")}`;
+        }
+      })
+      .catch(err => {
+        estado.textContent = `Error: ${err.message}`;
+      });
+    }
+  </script>
+</body>
+</html>
