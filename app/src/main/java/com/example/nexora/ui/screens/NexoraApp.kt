@@ -67,6 +67,7 @@ fun NexoraApp(
                 onActualizarPrecioPromo = promocionesViewModel::actualizarPrecioPromo,
                 onActualizarFondo = promocionesViewModel::actualizarFondo,
                 onGenerarImagen = { promocionesViewModel.generarImagen(context) },
+                onGuardarSupabase = { domain -> promocionesViewModel.guardarPromocionEnSupabase(context, domain) },
                 onEnviarPromocion = { promocionesViewModel.compartirPromocion(context) },
                 modifier = modifier
             )
