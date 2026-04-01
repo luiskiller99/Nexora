@@ -1,0 +1,280 @@
+package com.example.nexora.WEB
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Nexora Menú</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+          margin: 0;
+          font-family: Arial, sans-serif;
+          background: #0b1220;
+          color: white;
+          padding-bottom: 90px;
+        }
+
+        h1 {
+          text-align: center;
+          margin: 20px 0;
+        }
+
+        .grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 15px;
+          padding: 15px;
+        }
+
+        .card {
+          background: #111827;
+          border-radius: 12px;
+          overflow: hidden;
+          text-align: center;
+          border: 1px solid #374151;
+          cursor: pointer;
+          transition: 0.2s;
+        }
+
+        .card:hover {
+          transform: scale(1.05);
+        }
+
+        .card img {
+          width: 100%;
+          height: 140px;
+          object-fit: cover;
+        }
+
+        .nombre {
+          font-size: 14px;
+          margin: 10px 5px 5px;
+        }
+
+        .precio {
+          font-size: 16px;
+          font-weight: bold;
+          color: #38bdf8;
+          margin-bottom: 10px;
+        }
+
+        /* BOTÓN FLOTANTE */
+        .carrito-fijo {
+          position: fixed;
+          bottom: 15px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: linear-gradient(135deg, #6366f1, #8b5cf6);
+          color: white;
+          border: none;
+          padding: 14px 20px;
+          border-radius: 30px;
+          font-size: 16px;
+          font-weight: bold;
+          box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          z-index: 999;
+          cursor: pointer;
+          transition: opacity 0.3s;
+        }
+
+        .badge {
+          background: #22c55e;
+          color: black;
+          border-radius: 50%;
+          padding: 4px 8px;
+          font-size: 12px;
+        }
+
+        /* MODAL */
+        .modal {
+          display: none;
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.8);
+          justify-content: center;
+          align-items: flex-end;
+        }
+
+        .modal-content {
+          background: #111827;
+          width: 100%;
+          max-width: 420px;
+          border-radius: 20px 20px 0 0;
+          padding: 20px;
+          animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+          from { transform: translateY(100%); }
+          to { transform: translateY(0); }
+        }
+
+        .item-carrito {
+          padding: 8px;
+          border-bottom: 1px solid #374151;
+          font-size: 14px;
+        }
+
+        .total {
+          font-size: 18px;
+          font-weight: bold;
+          margin: 15px 0;
+          text-align: center;
+        }
+
+        .botones {
+          display: flex;
+          gap: 10px;
+        }
+
+        .btn {
+          flex: 1;
+          padding: 12px;
+          border-radius: 10px;
+          border: none;
+          font-size: 14px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+
+        .btn-wsp {
+          background: #22c55e;
+          color: black;
+        }
+
+        .btn-cerrar {
+          background: #374151;
+          color: white;
+        }
+
+        @media (max-width: 600px) {
+          .grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>📦 Productos</h1>
+
+<div class="grid" id="productos"></div>
+
+<!-- BOTÓN FLOTANTE -->
+<button id="botonCarrito" class="carrito-fijo" onclick="abrirCarrito()">
+    🛒 Carrito <span class="badge" id="contador">0</span>
+</button>
+
+<!-- MODAL -->
+<div class="modal" id="carritoModal">
+    <div class="modal-content">
+        <h2>🛒 Tu pedido</h2>
+
+        <div id="listaCarrito"></div>
+
+        <div class="total" id="total"></div>
+
+        <div class="botones">
+            <button class="btn btn-wsp" onclick="comprar()">WhatsApp</button>
+            <button class="btn btn-cerrar" onclick="cerrarCarrito()">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://xqildyppsdfnzruakwen.supabase.co";
+    const API_KEY = "sb_publishable_j07UF5UZxsNJ9kYSNbqWoQ_rXXxL_Fc";
+
+    let carrito = [];
+
+    async function cargarProductos() {
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
+        headers: {
+          "apikey": API_KEY,
+          "Authorization": `Bearer ${API_KEY}`
+        }
+      });
+
+      const data = await res.json();
+      const container = document.getElementById("productos");
+
+      data.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <img src="${p.imagen_url || 'https://via.placeholder.com/300'}">
+          <div class="nombre">${p.nombre}</div>
+          <div class="precio">₡${p.precio}</div>
+        `;
+
+        card.onclick = () => {
+          carrito.push(p);
+          actualizarContador();
+        };
+
+        container.appendChild(card);
+      });
+    }
+
+    function actualizarContador() {
+      document.getElementById("contador").textContent = carrito.length;
+    }
+
+    function abrirCarrito() {
+      const lista = document.getElementById("listaCarrito");
+      const totalEl = document.getElementById("total");
+
+      lista.innerHTML = "";
+      let total = 0;
+
+      carrito.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "item-carrito";
+        div.textContent = `${p.nombre} - ₡${p.precio}`;
+        lista.appendChild(div);
+        total += Number(p.precio);
+      });
+
+      totalEl.textContent = `Total: ₡${total}`;
+      document.getElementById("carritoModal").style.display = "flex";
+
+      // 🔥 ocultar botón flotante
+      document.getElementById("botonCarrito").style.opacity = "0";
+      document.getElementById("botonCarrito").style.pointerEvents = "none";
+    }
+
+    function cerrarCarrito() {
+      document.getElementById("carritoModal").style.display = "none";
+
+      // 🔥 mostrar botón flotante
+      document.getElementById("botonCarrito").style.opacity = "1";
+      document.getElementById("botonCarrito").style.pointerEvents = "auto";
+    }
+
+    function comprar() {
+      const telefono = "50684113653";
+
+      let mensaje = "Hola, quiero pedir:\n\n";
+      let total = 0;
+
+      carrito.forEach(p => {
+        mensaje += `• ${p.nombre} - ₡${p.precio}\n`;
+        total += Number(p.precio);
+      });
+
+      mensaje += `\nTotal: ₡${total}`;
+
+      window.open(`https://wa.me/${telefono}?text=${encodeURIComponent(mensaje)}`);
+    }
+
+    cargarProductos();
+</script>
+
+</body>
+</html>
