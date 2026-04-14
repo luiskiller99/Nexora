@@ -1,159 +1,171 @@
-package com.example.nexora.WEB
+```html id="nexora-carrito-fix-v2"
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>Nexora Menú</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
-        body {
-          margin: 0;
-          font-family: Arial, sans-serif;
-          background: #0b1220;
-          color: white;
-          padding-bottom: 90px;
+        body{
+          margin:0;
+          font-family:Arial,sans-serif;
+          background:#0b1220;
+          color:#fff;
+          padding-bottom:90px;
+        }
+        h1{
+          text-align:center;
+          margin:20px 0;
+        }
+        .grid{
+          display:grid;
+          grid-template-columns:repeat(3,1fr);
+          gap:15px;
+          padding:15px;
+        }
+        .card{
+          background:#111827;
+          border:1px solid #374151;
+          border-radius:12px;
+          overflow:hidden;
+          cursor:pointer;
+          transition:.2s;
+        }
+        .card:hover{
+          transform:scale(1.03);
+        }
+        .card img{
+          width:100%;
+          height:150px;
+          object-fit:cover;
+        }
+        .nombre{
+          font-size:14px;
+          padding:10px 8px 4px;
+        }
+        .precio{
+          font-size:16px;
+          font-weight:bold;
+          color:#38bdf8;
+          padding:0 8px 12px;
+        }
+        .mensaje{
+          grid-column:1/-1;
+          text-align:center;
+          color:#9ca3af;
+          padding:40px 10px;
         }
 
-        h1 {
-          text-align: center;
-          margin: 20px 0;
+        .carrito-fijo{
+          position:fixed;
+          left:50%;
+          bottom:15px;
+          transform:translateX(-50%);
+          background:linear-gradient(135deg,#6366f1,#8b5cf6);
+          border:none;
+          color:#fff;
+          padding:14px 20px;
+          border-radius:30px;
+          font-weight:bold;
+          cursor:pointer;
+          display:flex;
+          align-items:center;
+          gap:10px;
+          z-index:999;
+          transition:opacity .3s ease;
         }
 
-        .grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 15px;
-          padding: 15px;
+        .carrito-oculto{
+          opacity:0;
+          pointer-events:none;
         }
 
-        .card {
-          background: #111827;
-          border-radius: 12px;
-          overflow: hidden;
-          text-align: center;
-          border: 1px solid #374151;
-          cursor: pointer;
-          transition: 0.2s;
+        .badge{
+          background:#22c55e;
+          color:#000;
+          border-radius:50%;
+          padding:4px 8px;
+          font-size:12px;
         }
 
-        .card:hover {
-          transform: scale(1.05);
+        .modal{
+          display:none;
+          position:fixed;
+          inset:0;
+          background:rgba(0,0,0,.75);
+          justify-content:center;
+          align-items:flex-end;
         }
 
-        .card img {
-          width: 100%;
-          height: 140px;
-          object-fit: cover;
+        .modal-content{
+          background:#111827;
+          width:100%;
+          max-width:430px;
+          border-radius:20px 20px 0 0;
+          padding:20px;
+          max-height:85vh;
+          overflow:auto;
         }
 
-        .nombre {
-          font-size: 14px;
-          margin: 10px 5px 5px;
+        .item-carrito{
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          gap:10px;
+          padding:10px 0;
+          border-bottom:1px solid #374151;
         }
 
-        .precio {
-          font-size: 16px;
-          font-weight: bold;
-          color: #38bdf8;
-          margin-bottom: 10px;
+        .item-info{
+          flex:1;
         }
 
-        /* BOTÓN FLOTANTE */
-        .carrito-fijo {
-          position: fixed;
-          bottom: 15px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: linear-gradient(135deg, #6366f1, #8b5cf6);
-          color: white;
-          border: none;
-          padding: 14px 20px;
-          border-radius: 30px;
-          font-size: 16px;
-          font-weight: bold;
-          box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          z-index: 999;
-          cursor: pointer;
-          transition: opacity 0.3s;
+        .btn-borrar{
+          background:#ef4444;
+          color:white;
+          border:none;
+          border-radius:8px;
+          padding:6px 10px;
+          cursor:pointer;
+          font-size:12px;
+          font-weight:bold;
         }
 
-        .badge {
-          background: #22c55e;
-          color: black;
-          border-radius: 50%;
-          padding: 4px 8px;
-          font-size: 12px;
+        .total{
+          text-align:center;
+          font-size:18px;
+          font-weight:bold;
+          margin:15px 0;
         }
 
-        /* MODAL */
-        .modal {
-          display: none;
-          position: fixed;
-          inset: 0;
-          background: rgba(0,0,0,0.8);
-          justify-content: center;
-          align-items: flex-end;
+        .botones{
+          display:flex;
+          gap:10px;
         }
 
-        .modal-content {
-          background: #111827;
-          width: 100%;
-          max-width: 420px;
-          border-radius: 20px 20px 0 0;
-          padding: 20px;
-          animation: slideUp 0.3s ease;
+        .btn{
+          flex:1;
+          padding:12px;
+          border:none;
+          border-radius:10px;
+          font-weight:bold;
+          cursor:pointer;
         }
 
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
+        .btn-wsp{
+          background:#22c55e;
+          color:#000;
         }
 
-        .item-carrito {
-          padding: 8px;
-          border-bottom: 1px solid #374151;
-          font-size: 14px;
+        .btn-cerrar{
+          background:#374151;
+          color:#fff;
         }
 
-        .total {
-          font-size: 18px;
-          font-weight: bold;
-          margin: 15px 0;
-          text-align: center;
-        }
-
-        .botones {
-          display: flex;
-          gap: 10px;
-        }
-
-        .btn {
-          flex: 1;
-          padding: 12px;
-          border-radius: 10px;
-          border: none;
-          font-size: 14px;
-          font-weight: bold;
-          cursor: pointer;
-        }
-
-        .btn-wsp {
-          background: #22c55e;
-          color: black;
-        }
-
-        .btn-cerrar {
-          background: #374151;
-          color: white;
-        }
-
-        @media (max-width: 600px) {
-          .grid {
-            grid-template-columns: repeat(2, 1fr);
+        @media(max-width:600px){
+          .grid{
+            grid-template-columns:repeat(2,1fr);
           }
         }
     </style>
@@ -163,21 +175,20 @@ package com.example.nexora.WEB
 
 <h1>📦 Productos</h1>
 
-<div class="grid" id="productos"></div>
+<div id="productos" class="grid">
+    <div class="mensaje">Cargando productos...</div>
+</div>
 
-<!-- BOTÓN FLOTANTE -->
 <button id="botonCarrito" class="carrito-fijo" onclick="abrirCarrito()">
-    🛒 Carrito <span class="badge" id="contador">0</span>
+    🛒 Carrito <span id="contador" class="badge">0</span>
 </button>
 
-<!-- MODAL -->
 <div class="modal" id="carritoModal">
     <div class="modal-content">
         <h2>🛒 Tu pedido</h2>
 
         <div id="listaCarrito"></div>
-
-        <div class="total" id="total"></div>
+        <div id="total" class="total"></div>
 
         <div class="botones">
             <button class="btn btn-wsp" onclick="comprar()">WhatsApp</button>
@@ -192,106 +203,132 @@ package com.example.nexora.WEB
 
     let carrito = [];
 
-    function resolverImagenUrl(producto) {
-      const cruda = (producto.imagen_url || producto["imagen url"] || "").trim();
-      if (!cruda) return "https://via.placeholder.com/300";
+    function resolverImagenUrl(p){
+      const raw = (p.imagen_url || "").trim();
 
-      if (cruda.startsWith("http://") || cruda.startsWith("https://")) {
-        return cruda;
+      if(!raw) return "https://via.placeholder.com/400x300?text=Sin+Imagen";
+
+      if(raw.includes("/object/sign/Promos/")){
+        const archivo = raw.split("/object/sign/Promos/")[1].split("?")[0];
+        return `${SUPABASE_URL}/storage/v1/object/public/Promos/${archivo}`;
       }
 
-      if (cruda.startsWith("/")) {
-        return `${SUPABASE_URL}${cruda}`;
-      }
+      if(raw.includes("/object/public/Promos/")) return raw;
 
-      if (cruda.startsWith("storage/v1/object/public/")) {
-        return `${SUPABASE_URL}/${cruda}`;
-      }
+      if(raw.startsWith("http")) return raw;
 
-      return cruda;
+      return `${SUPABASE_URL}/storage/v1/object/public/Promos/${raw}`;
     }
 
-    async function cargarProductos() {
-      const select = encodeURIComponent('id,nombre,precio,imagen_url,"imagen url"');
-      const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=${select}`, {
-        headers: {
-          "apikey": API_KEY,
-          "Authorization": `Bearer ${API_KEY}`
+    async function cargarProductos(){
+      const cont = document.getElementById("productos");
+
+      try{
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`,{
+          headers:{
+            apikey:API_KEY,
+            Authorization:`Bearer ${API_KEY}`
+          }
+        });
+
+        const data = await res.json();
+        cont.innerHTML = "";
+
+        if(!data.length){
+          cont.innerHTML = `<div class="mensaje">No hay productos.</div>`;
+          return;
         }
-      });
 
-      if (!res.ok) {
-        console.error("Error consultando productos en Supabase", await res.text());
-        return;
+        data.forEach(p=>{
+          const nombre = p.nombre || "Producto";
+          const precio = Number(p.precio || 0);
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          card.innerHTML = `
+            <img src="${resolverImagenUrl(p)}"
+                 onerror="this.src='https://via.placeholder.com/400x300?text=Sin+Imagen'">
+            <div class="nombre">${nombre}</div>
+            <div class="precio">₡${precio}</div>
+          `;
+
+          card.onclick = ()=>{
+            carrito.push({nombre,precio});
+            actualizarContador();
+          };
+
+          cont.appendChild(card);
+        });
+
+      }catch(e){
+        cont.innerHTML = `<div class="mensaje">Error cargando productos</div>`;
       }
-
-      const data = await res.json();
-      const container = document.getElementById("productos");
-      container.innerHTML = "";
-
-      data.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-          <img src="${resolverImagenUrl(p)}" onerror="this.src='https://via.placeholder.com/300'">
-          <div class="nombre">${p.nombre}</div>
-          <div class="precio">₡${p.precio}</div>
-        `;
-
-        card.onclick = () => {
-          carrito.push(p);
-          actualizarContador();
-        };
-
-        container.appendChild(card);
-      });
     }
 
-    function actualizarContador() {
+    function actualizarContador(){
       document.getElementById("contador").textContent = carrito.length;
     }
 
-    function abrirCarrito() {
+    function abrirCarrito(){
+      document.getElementById("carritoModal").style.display = "flex";
+      document.getElementById("botonCarrito").classList.add("carrito-oculto");
+      renderCarrito();
+    }
+
+    function cerrarCarrito(){
+      document.getElementById("carritoModal").style.display = "none";
+      document.getElementById("botonCarrito").classList.remove("carrito-oculto");
+    }
+
+    function eliminarProducto(index){
+      carrito.splice(index,1);
+      actualizarContador();
+      renderCarrito();
+    }
+
+    function renderCarrito(){
       const lista = document.getElementById("listaCarrito");
       const totalEl = document.getElementById("total");
 
       lista.innerHTML = "";
       let total = 0;
 
-      carrito.forEach(p => {
+      if(carrito.length === 0){
+        lista.innerHTML = `<div class="mensaje">Tu carrito está vacío</div>`;
+      }
+
+      carrito.forEach((item,index)=>{
+        total += Number(item.precio);
+
         const div = document.createElement("div");
         div.className = "item-carrito";
-        div.textContent = `${p.nombre} - ₡${p.precio}`;
+
+        div.innerHTML = `
+          <div class="item-info">${item.nombre} - ₡${item.precio}</div>
+          <button class="btn-borrar" onclick="eliminarProducto(${index})">✕</button>
+        `;
+
         lista.appendChild(div);
-        total += Number(p.precio);
       });
 
       totalEl.textContent = `Total: ₡${total}`;
-      document.getElementById("carritoModal").style.display = "flex";
-
-      // 🔥 ocultar botón flotante
-      document.getElementById("botonCarrito").style.opacity = "0";
-      document.getElementById("botonCarrito").style.pointerEvents = "none";
     }
 
-    function cerrarCarrito() {
-      document.getElementById("carritoModal").style.display = "none";
+    function comprar(){
+      if(carrito.length === 0){
+        alert("Tu carrito está vacío");
+        return;
+      }
 
-      // 🔥 mostrar botón flotante
-      document.getElementById("botonCarrito").style.opacity = "1";
-      document.getElementById("botonCarrito").style.pointerEvents = "auto";
-    }
-
-    function comprar() {
       const telefono = "50660238527";
 
       let mensaje = "Hola, quiero pedir:\n\n";
       let total = 0;
 
-      carrito.forEach(p => {
-        mensaje += `• ${p.nombre} - ₡${p.precio}\n`;
-        total += Number(p.precio);
+      carrito.forEach(item=>{
+        mensaje += `• ${item.nombre} - ₡${item.precio}\n`;
+        total += Number(item.precio);
       });
 
       mensaje += `\nTotal: ₡${total}`;
@@ -300,7 +337,9 @@ package com.example.nexora.WEB
     }
 
     cargarProductos();
+    setInterval(cargarProductos,30000);
 </script>
 
 </body>
 </html>
+```
