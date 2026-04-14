@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.nexora.ui.viewmodel.ClientesViewModel
 import com.example.nexora.ui.viewmodel.LoginViewModel
-import com.example.nexora.ui.viewmodel.ProductosViewModel
+import com.example.nexora.ui.viewmodel.ProductViewModel
 import com.example.nexora.ui.viewmodel.PromocionesViewModel
 
 private enum class NexoraDestination {
@@ -25,7 +25,7 @@ fun NexoraApp(
     loginViewModel: LoginViewModel,
     promocionesViewModel: PromocionesViewModel,
     clientesViewModel: ClientesViewModel,
-    productosViewModel: ProductosViewModel,
+    productViewModel: ProductViewModel,
     modifier: Modifier = Modifier
 ) {
     var currentDestination by rememberSaveable {
@@ -84,12 +84,9 @@ fun NexoraApp(
         }
 
         NexoraDestination.Productos -> {
-            ProductosScreen(
-                productos = productosViewModel.listaProductos,
-                imagenSeleccionadaUri = productosViewModel.imagenSeleccionadaUri,
+            ProductScreen(
+                viewModel = productViewModel,
                 onBackClick = { currentDestination = NexoraDestination.Dashboard },
-                onSeleccionarImagen = productosViewModel::seleccionarImagen,
-                onAgregarProducto = productosViewModel::agregarProducto,
                 modifier = modifier
             )
         }
