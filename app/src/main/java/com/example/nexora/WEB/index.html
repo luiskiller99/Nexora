@@ -192,6 +192,25 @@ package com.example.nexora.WEB
 
     let carrito = [];
 
+    function resolverImagenUrl(producto) {
+      const cruda = (producto.imagen_url || producto["imagen url"] || "").trim();
+      if (!cruda) return "https://via.placeholder.com/300";
+
+      if (cruda.startsWith("http://") || cruda.startsWith("https://")) {
+        return cruda;
+      }
+
+      if (cruda.startsWith("/")) {
+        return `${SUPABASE_URL}${cruda}`;
+      }
+
+      if (cruda.startsWith("storage/v1/object/public/")) {
+        return `${SUPABASE_URL}/${cruda}`;
+      }
+
+      return cruda;
+    }
+
     async function cargarProductos() {
       const res = await fetch(`${SUPABASE_URL}/rest/v1/productos?select=*`, {
         headers: {
@@ -200,15 +219,21 @@ package com.example.nexora.WEB
         }
       });
 
+      if (!res.ok) {
+        console.error("Error consultando productos en Supabase", await res.text());
+        return;
+      }
+
       const data = await res.json();
       const container = document.getElementById("productos");
+      container.innerHTML = "";
 
       data.forEach(p => {
         const card = document.createElement("div");
         card.className = "card";
 
         card.innerHTML = `
-          <img src="${p.imagen_url || 'https://via.placeholder.com/300'}">
+          <img src="${resolverImagenUrl(p)}" onerror="this.src='https://via.placeholder.com/300'">
           <div class="nombre">${p.nombre}</div>
           <div class="precio">₡${p.precio}</div>
         `;
